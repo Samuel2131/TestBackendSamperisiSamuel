@@ -3,7 +3,6 @@ import express from "express";
 import { deleteOne, find, findByCategory, getAll, insertOne } from "./db";
 import { body, param, query, header } from "express-validator";
 import { controlName, isAuth, showErrors } from "./utils";
-import { Course } from "./models";
 
 const router = express.Router();
 
