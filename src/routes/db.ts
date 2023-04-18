@@ -11,7 +11,6 @@ export const insertOne = async (newObj: Course): Promise<Course | number> => {
         await course.save();
         return course;
     } catch(e: any) {
-        //if(e.code && e.code === 11000) return 409;
         return 500;
     }
 }
