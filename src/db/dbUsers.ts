@@ -1,5 +1,5 @@
 
-import { UserDB, User } from "./models";
+import { UserDB, User } from "../models/models";
 
 export const insertUser = async (newObj: User) => {
     try{

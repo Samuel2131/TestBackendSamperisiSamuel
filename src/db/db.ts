@@ -1,9 +1,5 @@
 
-import mongoose from "mongoose";
-import { urlDB } from "./utils";
-import { CoursesDB, Course } from "./models";
-
-mongoose.connect(urlDB);
+import { CoursesDB, Course } from "../models/models";
 
 export const insertOne = async (newObj: Course): Promise<Course | number> => {
     try{

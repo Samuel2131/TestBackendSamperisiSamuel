@@ -2,9 +2,9 @@ import express from "express";
 import { body, header } from "express-validator";
 import bycript from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
-import { find, findWithVerify, insertUser, replaceOne, isIn } from "./dbUsers";
+import { find, findWithVerify, insertUser, replaceOne, isIn } from "../db/dbUsers";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { showErrors, sshKey, isAuth} from "./utils";
+import { showErrors, sshKey } from "../utils/utils";
 
 const router = express.Router();
 
@@ -27,7 +27,7 @@ router.post("/signup", body("name").notEmpty().isString(), body("surname").notEm
 router.post("/login", body("email").notEmpty().isString().isEmail(), body("password").notEmpty().isString(), showErrors, async ({body}, res) => {
     const user = await find(body.email);
     if(typeof user === "number") return res.status(500).json({message: "server error..."});
-    if(!user || user.verify) res.status(401).json({message: "user not found..."});
+    if(!user || user.verify) res.status(404).json({message: "user not found..."});
     else if(!await bycript.compare(body.password, user.password)) res.status(401).json({message: "wrong password..."});
     else { 
         const userWithoutPassword = {
@@ -45,7 +45,7 @@ router.post("/login", body("email").notEmpty().isString().isEmail(), body("passw
 router.get("/validate/:token", async ({params}, res) => {
     const user = await findWithVerify(params.token);
     if(typeof user === "number") return res.status(500).json({message: "server error..."});
-    if(!user) res.status(400).json({message: "user not found..."});
+    if(!user) res.status(404).json({message: "user not found..."});
     else {
         const verify = user.verify;
         if(!await replaceOne(verify as string, {id: user.id, name: user.name, email: user.email, surname: user.surname, password: user.password})) return res.status(500).json({message: "server error..."});
@@ -56,7 +56,7 @@ router.get("/validate/:token", async ({params}, res) => {
 router.get("/me", header("authorization").isJWT(), showErrors, async ({headers}, res) => {
     try{
         const user = (await jwt.verify(headers.authorization as string, sshKey)) as JwtPayload;
-        if(await !isIn(user.email)) return res.status(400).json({message: "not autorizhed"});
+        if(await !isIn(user.email)) return res.status(401).json({message: "not autorizhed"});
         res.json({
             id: user.id,
             name: user.name,
@@ -64,7 +64,7 @@ router.get("/me", header("authorization").isJWT(), showErrors, async ({headers},
             email: user.email
         });
     } catch(err) {
-        res.status(400).json({message: "not autorizhed"});
+        res.status(401).json({message: "not autorizhed"});
     }
 });
 

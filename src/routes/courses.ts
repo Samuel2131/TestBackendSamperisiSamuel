@@ -1,8 +1,8 @@
 
 import express from "express";
-import { deleteOne, find, findByCategory, getAll, insertOne } from "./db";
+import { deleteOne, find, getAll, insertOne } from "../db/db";
 import { body, param, query, header } from "express-validator";
-import { controlName, isAuth, showErrors } from "./utils";
+import { controlName, isAuth, showErrors } from "../utils/utils";
 
 const router = express.Router();
 

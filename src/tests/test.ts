@@ -2,9 +2,9 @@
 import request from "supertest"
 require("chai").should();
 import { app } from "../app";
-import { deleteOne, dropDatabase, find, insertOne } from "../routes/db";
+import { deleteOne, dropDatabase, find, insertOne } from "../db/db";
 import { expect } from "chai";
-import { dropUserDB, insertUser } from "../routes/dbUsers";
+import { dropUserDB, insertUser } from "../db/dbUsers";
 import { v4 } from "uuid";
 import bcrypt from "bcrypt";
 
@@ -111,7 +111,7 @@ describe("endpoints", () => {
             maxNumSub: 24
         };
         before(async () => {
-            const course: any = await insertOne(course2);
+            await insertOne(course2);
         });
         it("test 200 for get all courses", async () => {
             const {body, status} = await request(app).get(`${pathEndpoint}`).send();
@@ -119,13 +119,13 @@ describe("endpoints", () => {
 
             body.should.have.property("length");
         });
-        it("test filter by cost", async () =>{
+        it("test filter by cost", async () => {
             const {body, status} = await request(app).get(`${pathEndpoint}?minCost=10&maxCost=40`).send();
             status.should.be.equal(200);
 
             expect(body.length).to.equal(1);
         });
-        it("test filter by duration", async () =>{
+        it("test filter by duration", async () => {
             const {body, status} = await request(app).get(`${pathEndpoint}?minDuration=5000`).send();
             status.should.be.equal(200);
 
@@ -155,7 +155,7 @@ describe("endpoints", () => {
             const { status: s2 } = await request(app).get(`${pathEndpoint}?minCost=-10`).send();
             s2.should.be.equal(400);
 
-            const { body, status: s3 } = await request(app).get(`${pathEndpoint}?minDuration=-10`).send();
+            const { status: s3 } = await request(app).get(`${pathEndpoint}?minDuration=-10`).send();
             s3.should.be.equal(400);
         });
     });
